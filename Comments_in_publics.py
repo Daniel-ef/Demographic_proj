@@ -1,19 +1,20 @@
 import json
 import requests
 import time
+import re
 
 with open('db/public_list', 'r') as f:
     public_list = f.read().split('\n') # Список групп в виде -номер
 
 
-def get_list_of_comments_id(public_id, comments_num):  # Возвращаем список id постов
+def get_list_of_comments_id(public_id, post_num):  # Возвращаем список id постов
     com_id_list = []
     com_offset = 1  # Не берём первый пост (закреплённый)
-    while len(com_id_list) < comments_num:
+    while len(com_id_list) < post_num:
         wall_res = requests.get('http://api.vk.com/method/wall.get', {
             'owner_id': public_id,
             'offset': com_offset,
-            'count': comments_num % 100,
+            'count': post_num if post_num <= 100 else 100,
             'extended': '0'
         }).json()
 
@@ -24,13 +25,13 @@ def get_list_of_comments_id(public_id, comments_num):  # Возвращаем с
             return []
 
         for item in wall_res:
-            if len(com_id_list) != comments_num:
+            if len(com_id_list) != post_num:
                 if int(item['comments']['count']):
                     com_id_list.append([item['id'], item['comments']['count']])
             else:
                 break
-        com_offset += comments_num % 100
-        comments_num -= 100
+        com_offset += post_num % 100
+        post_num -= 100
     return com_id_list
 
 
@@ -41,7 +42,7 @@ def create_new_man(people_db, id, text):
             'user_ids': id,
             'fields': 'first_name,second_name,sex,bdate,universities,schools,relation,personal,career,military'
         }, timeout=3).json()['response'][0]
-        if res.get('universities') or res.get('schools'):
+        if res.get('bdate') and re.search('\d\d\d\d', res.get('bdate')) and (res.get('universities') or res.get('schools')):
             people_db[id] = res
             people_db[id]['user_comments'] = [text]
             print('create new man', id)
@@ -87,19 +88,18 @@ def make_db(com_id_list, public_id):
 
 
 def public_handling(public_list):
-    comments_amount = 30
+    post_amount = 100
     db = []  # База людей
     for public_id in public_list:
-        com_id_list = get_list_of_comments_id(public_id, comments_amount)  # Список (id) постов в группе
+        com_id_list = get_list_of_comments_id(public_id, post_amount)  # Список (id) постов в группе
         print('public number', public_id[1:])
         people_db = make_db(com_id_list, public_id)  # Словарь {человек: [информация, комменты]}
 
         for key in people_db.keys():
             people_db[key]['id'] = key
             db.append(people_db[key])
-
-    with open('db/people_db', 'w') as f:
-        json.dump(db, f)
+        with open('db/people_db', 'w') as f:
+            json.dump(db, f)
 
 errors_in_persons = 0
 errors_in_comments = 0
