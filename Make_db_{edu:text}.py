@@ -1,8 +1,12 @@
 import json
 import os
 
+
+##########################################################
+
+
 with open('db/people_db') as f:
-    db = json.load(f)
+    db = json.load(f) # Все данные о человеке
 
 sample = {0: [], 1: [], 2: [], 3: [], 4: []}
 
@@ -42,6 +46,57 @@ for hb in db:
         if group:
             sample[group - 1].append(hb['user_comments'])
 
-os.remove('db/people_sample')
+sample_names = dict(
+    prime_school=sample[0],
+    high_school=sample[1],
+    no_university=sample[2],
+    on_higher_edu=sample[3],
+    graduated=sample[4])
+
+os.remove('db/people_sample2')
+
+with open('db/people_sample2', 'w') as f:
+    json.dump(sample_names, f)
+
+# {'class_name': [comments]}
+
+
+
+################################################################
+
+with open('db/people_sample2') as f:
+    ps = json.load(f)
+
+print(ps)
+k = 0
+messages = []
+mess_class = []
+names_dic = {}
+k = 0
+for key in ps:
+    names_dic[k] = key
+    messages.append(ps[key])
+    mess_class.append([k] * len(ps[key]))
+    k += 1
+dic = {'all_mes': messages,
+       'classes': mess_class,
+       'class_names': names_dic}
+
+for key in dic:
+    print(key, dic[key])
+
+for i in range(len(dic['classes'])):
+    print(dic['class_names'][i], len(dic['classes'][i]))
+
+
+
 with open('db/people_sample', 'w') as f:
-    json.dump(sample, f)
+    json.dump(dic, f)
+
+"""
+{
+'class_names': {class_number : class_name},
+'all_mes': [a_few_lists_of_comments],
+'classes': [a_few_lists_of_class_number]
+}
+"""
