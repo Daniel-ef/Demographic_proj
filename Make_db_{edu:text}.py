@@ -6,7 +6,7 @@ import os
 
 
 with open('db/people_db') as f:
-    db = json.load(f) # Все данные о человеке
+    db = json.load(f)  # Все данные о человеке
 
 sample = {0: [], 1: [], 2: [], 3: [], 4: []}
 
@@ -28,8 +28,6 @@ for hb in db:
     date = int(hb['bdate'][-4:])
     group = None
     k += 1
-    print(k, hb)
-    print(hb.get('universities'))
 
     if hb['user_comments']:
         if date > 1998:
@@ -61,33 +59,29 @@ with open('db/people_sample2', 'w') as f:
 # {'class_name': [comments]}
 
 
-
 ################################################################
 
 with open('db/people_sample2') as f:
     ps = json.load(f)
 
 print(ps)
-k = 0
-messages = []
-mess_class = []
+com_class = [{} for el in range(len(ps.keys()))]
 names_dic = {}
 k = 0
 for key in ps:
     names_dic[k] = key
-    messages.append(ps[key])
-    mess_class.append([k] * len(ps[key]))
+    for meses in ps[key]:
+        for mes in meses:
+            com_class[k][mes] = k
     k += 1
-dic = {'all_mes': messages,
-       'classes': mess_class,
+dic = {'comments-class': com_class,
        'class_names': names_dic}
 
 for key in dic:
     print(key, dic[key])
 
-for i in range(len(dic['classes'])):
-    print(dic['class_names'][i], len(dic['classes'][i]))
-
+for el in dic['comments-class']:
+    print(el)
 
 
 with open('db/people_sample', 'w') as f:
