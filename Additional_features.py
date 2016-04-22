@@ -1,30 +1,31 @@
 import numpy
 import re
-
-
-def fouls_num(comment):
-    k = 0
-    k += len(re.findall('^бля[(ть)д]?', comment))
-    k += len(re.findall('ху[йие]\w+', comment))
-    k += len(re.findall('шлюх\w*', comment))
-    k += len(re.findall('сос[ак]\w+', comment))
-    k += len(re.findall('^[еёeЁ]б[ау]\w*', comment))
-    k += len(re.findall('пизд\w+', comment))
-    k += len(re.findall('[^c]трах[ан]\w+', comment))
-    k += len(re.findall('залуп\w*', comment))
-    k += len(re.findall('срак[аоу]\w*', comment))
-    k += len(re.findall('\w*дроч\w+', comment))
-    k += len(re.findall('\w*говн\w+', comment))
-    k += len(re.findall('ссан\w+', comment))
-    k += len(re.findall('пидр\w*', comment))
-    k += len(re.findall('уеб[(ище)ан]\w*', comment))
-    return k
+from functools import reduce
 
 
 def foul_find(mas):
     vec = []
+    patterns =['^бля[(ть)д]?', 'ху[йиеё]\w+', 'шлюх\w*''сос[ак]\w+', '^[еёeЁ]б[ау]\w*',
+              '^[еёeЁ]б[ау]\w*', 'пизд\w+', '[^c]трах[ан]\w+', 'залуп\w*', 'срак[аоу]\w*',
+              '\w*дроч\w+', '\w*говн\w+', 'ссан\w+', 'пидр\w*', 'уеб[(ище)ан]\w*']
+    patterns = list(map(lambda x: re.compile(x), patterns))
     for comment in mas:
-        vec.append(fouls_num(comment))
-    return numpy.array([vec])
+        vec.append(reduce(lambda sum, pat: sum + len(pat.findall(comment.lower())), patterns, 0))
+    return [vec]
 
 
+def punctuation(mas, vec_feat):  # , . ! ? : -
+    marks = ['\.', ',', '!', '\?', ':', '-']
+    for mark in marks:
+        vec = []
+        for com in mas:
+            vec.append(len(re.findall(mark, com)))
+        vec_feat.append(vec)
+    return vec_feat
+
+
+
+def add_feat(mas):
+    vec_feat = foul_find(mas)
+    vec_feat = punctuation(mas, vec_feat)
+    return numpy.array(vec_feat).T
