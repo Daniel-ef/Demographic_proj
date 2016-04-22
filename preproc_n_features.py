@@ -3,21 +3,28 @@ import time
 
 import nltk
 import numpy
-from Additional_features import foul_find
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.cross_validation import LeaveOneOut
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import GaussianNB
+from sklearn.preprocessing import MinMaxScaler
 
+from Additional_features import add_feat
+
+with open('db/stop_word_dic', 'r') as f:
+    stop_words = f.read().split('\n')
+
+
+np = numpy
 Classifier = GaussianNB()
 Tokenizer = nltk.tokenize.TweetTokenizer
 Scaler = MinMaxScaler((0, 2))
-Vectorizer = CountVectorizer(ngram_range=(1, 2), tokenizer=Tokenizer().tokenize)
+Vectorizer = CountVectorizer(ngram_range=(1, 2),
+                             tokenizer=Tokenizer().tokenize,
+                             stop_words=stop_words)
 
-np = numpy
 fold_nums = 5
 loo = LeaveOneOut(fold_nums)
-mes_amount = 2000
+mes_amount = -1  # Количество комментариев для каждого fold'а (-1 == все)
 
 log = ''
 log += time.ctime(time.time())
@@ -57,31 +64,42 @@ def fill_cross_val(key, fold_nums, mes_amount=500):
 
     return [np.array(messages), np.array(mes_class)]
 
+# Проведение кросс-валидации 4:1
 messages, mess_class = fill_cross_val('comments-class', fold_nums, mes_amount)
 
 
 estim = 0
 for train_index, test_index in loo:
 
+    # Обучающая и тестирующая выборки
     Com_train, Class_train = ravel(messages[train_index]), ravel(mess_class[train_index])
     Com_test, Class_test = messages[test_index][0], mess_class[test_index][0]
 
-    fouls_train = foul_find(ravel(messages[train_index]))
-    fouls_test = foul_find(messages[test_index[0]])
 
+    # Собственные признаки
+    add_feat_train = add_feat(ravel(messages[train_index]))
+    add_feat_test = add_feat(messages[test_index[0]])
 
+    #     Подсчёт количества слов
+    #     Конкатенация признаков
+    #     Приведение к нормальному виду
+
+    # Обработка обучающей выборки:
     Com_train = Vectorizer.fit_transform(Com_train).toarray()
-    Com_train = np.concatenate((Com_train, fouls_train.T), axis=1)
+    Com_train = np.concatenate((Com_train, add_feat_train), axis=1)
     Com_train = Scaler.fit_transform(Com_train)
 
+    # Обработка тестирующей выборки
     Com_test = Vectorizer.transform(Com_test).toarray()
-    Com_test = np.concatenate((Com_test, fouls_test.T), axis=1)
+    Com_test = np.concatenate((Com_test, add_feat_test), axis=1)
     Com_test = Scaler.transform(Com_test)
 
 
+    # Обучение классификатора
     Classifier.fit(Com_train, Class_train)
     ans = Classifier.predict(Com_test)
 
+    # Оценка предсказаний классификатора
     tr = 0
     for i in range(len(ans)):
         if ans[i] == Class_test[i]:
@@ -90,6 +108,7 @@ for train_index, test_index in loo:
     print(str((tr / len(Class_test)) * 100) + ' %')
 
 print(str((estim / fold_nums) * 100) + ' %')
-log += str((estim / fold_nums) * 100) + ' %\n\n'
+
+# Запись логов в файл
 with open('db/log', 'a') as f:
-    f.write(log)
+    f.write(log + str((estim / fold_nums) * 100) + ' %\n\n')
