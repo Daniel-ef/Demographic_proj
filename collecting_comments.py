@@ -1,10 +1,14 @@
 import json
-import requests
-import time
 import re
 
+import requests
+
+errors_in_persons = 0
+errors_in_comments = 0
+people = 0
+
 with open('db/public_list', 'r') as f:
-    public_list = f.read().split('\n') # Список групп в виде -номер
+    public_list = f.read().split('\n')  # Список групп в виде -номер
 
 
 def get_list_of_comments_id(public_id, post_num):  # Возвращаем список id постов
@@ -101,10 +105,11 @@ def public_handling(public_list):
         with open('db/people_db', 'w') as f:
             json.dump(db, f)
 
-errors_in_persons = 0
-errors_in_comments = 0
-people = 0
-public_handling(public_list)
-print('errors in persons', errors_in_persons)
-print('errors in comments', errors_in_comments)
-print('number of people', people)
+
+
+
+def init():
+    public_handling(public_list)
+    print('errors in persons', errors_in_persons)
+    print('errors in comments', errors_in_comments)
+    print('number of people', people)
