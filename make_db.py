@@ -6,7 +6,7 @@ def init():
     with open('db/people_db') as f:
         db = json.load(f)  # Все данные о человеке
 
-    sample = {0: [], 1: [], 2: [], 3: [], 4: []}
+    sample = {0: [], 1: [], 2: [], 3: []}
 
     def min_grade(hb):
         grade = 2100
@@ -26,37 +26,34 @@ def init():
         k += 1
 
         if hb['user_comments']:
-            if date > 1998:
+            if date > 1996 and not hb.get('universities'):
                 group = 1
-            elif date > 1996 and not hb.get('universities'):
-                group = 2
             elif not hb.get('universities'):
-                group = 3
+                group = 2
             elif min_grade(hb):
                 if min_grade(hb) >= 2016:
-                    group = 4
+                    group = 3
                 elif min_grade(hb) < 2016:
-                    group = 5
+                    group = 4
             if group:
                 sample[group - 1].append(hb['user_comments'])
 
     sample_names = dict(
-        prime_school=sample[0],
-        high_school=sample[1],
-        no_university=sample[2],
-        on_higher_edu=sample[3],
-        graduated=sample[4])
+        school=sample[0],
+        no_university=sample[1],
+        on_higher_edu=sample[2],
+        graduated=sample[3])
 
-    os.remove('db/people_sample2')
+    os.remove('db/sample_class_comm')
 
-    with open('db/people_sample2', 'w') as f:
+    with open('db/sample_class_comm', 'w') as f:
         json.dump(sample_names, f)
 
     # {'class_name': [comments]}
 
     ################################################################
 
-    with open('db/people_sample2') as f:
+    with open('db/sample_class_comm') as f:
         ps = json.load(f)
 
     print(ps)
@@ -78,5 +75,7 @@ def init():
     for el in dic['comments-class']:
         print(el)
 
-    with open('db/people_sample', 'w') as f:
+    with open('db/sample', 'w') as f:
         json.dump(dic, f)
+
+init()
