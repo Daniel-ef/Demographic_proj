@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="css/bootstrap.min.css"></script>
+<script src="css/jumbotron-narrow.css"></script>
+<script type="text/javascript" src="js/my_js.js"></script>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Classifier main page</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/jumbotron-narrow.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+<div class="container" style="-webkit-user-select:none; -moz-user-select:none;-ms-user-select:none">
+    <div class="header">
+        <ul class="nav nav-pills pull-right">
+            <li class="active"><a href="/">Settings</a></li>
+            <li class="active"><a href="/ans">Results</a></li>
+            <li><a href="#">About</a></li>
+        </ul>
+        <h3 class="text-muted" >Classify your comment</h3>
+    </div>
+
+    <div class="jumbotron">
+        <h1>Choose classifiers</h1>
+        <h2></h2>
+        <div class="checkbox">
+            <h3><input type="checkbox" value="" ><b>Sex</b></h3>
+        </div>
+        <div class="checkbox">
+            <h3><input type="checkbox" value=""><b>Age</b></h3>
+        </div>
+        <div class="checkbox disabled">
+            <h3><input type="checkbox" value=""><b>Education</b></h3>
+        </div>
+    </div>
+
+    <div class="jumbotron">
+        <h2>Choose sampling method</h2>
+        <div class="btn-group btn-group">
+            <button type="button" class="btn btn-success" id="btn_comment">By Comment</button>
+            <button type="button" class="btn btn-primary" id="btn_groups">By VK Groups</button>
+            <button type="button" class="btn btn-info" id="btn_file">By File</button>
+        </div>
+        <h1></h1>
+        <textarea id="comment_form" class="form-control" rows="3">Write comment</textarea>
+
+        <textarea id="groups_form" class="form-control" rows="3" style="display:none">Write groups (-group_number)</textarea>
+
+        <div id="file_form" style="display:none">
+            <form name="upload">
+                <input type="file" name="myfile">
+                <input type="submit" value="Загрузить">
+            </form>
+        </div>
+
+        <h1></h1>
+        <button type="button" class="btn btn-danger btn-lg" id="btn_result" onclick="go()">Go!</button>
+
+   </div>
+
+    <div class="footer">
+        <p>&copy; HSE AMI 2016, Efimov Daniil</p>
+    </div>
+
+</div> <!-- /container -->
+
+
+</body>
+</html>
