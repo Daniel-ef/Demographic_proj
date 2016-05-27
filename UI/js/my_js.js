@@ -16,59 +16,45 @@ function getXmlHttp(){
 }
 
 
-// Focus on comment_form
-$(document).ready(function() {
-    $("#btn_comment").click(function () {
-        if (document.getElementById('groups_form').style.display != 'none')
-            $("#groups_form").hide("slow", function () {});
-        else if (document.getElementById('file_form').style.display != 'none')
-            $('#file_form').hide("slow", function() {});
 
-        if (document.getElementById('comment_form').style.display != 'none') {
-            document.getElementById('comment_form').textContent = '';
-        } else {
-            $("#comment_form").show("slow", function () {
-                document.getElementById('comment_form').textContent = 'Write comment';
-            });
-        }
-    });
-});
+function show_groups_form() {
+    if (document.getElementById('file_form').style.display != 'none') {
+        $("#file_form").hide("slow", function () {} );
+    }
+    $("#groups_form").show("slow", function () {});
+}
 
 
-$(document).ready(function() {
-    $("#btn_groups").click(function () {
-        if (document.getElementById('file_form').style.display != 'none')
-            $('#file_form').hide("slow", function() {});
-        else if (document.getElementById('comment_form').style.display != 'none')
-            $('#comment_form').hide("slow", function() {});
-
-        if (document.getElementById('groups_form').style.display != 'none') {
-            document.getElementById('groups_form').textContent = '';
-        } else {
-            $("#groups_form").show("slow", function () {
-                document.getElementById('groups_form').textContent = 'Write groups (-group_number)';
-            });
-        }
-    });
-});
+function show_file_form() {
+    if (document.getElementById('groups_form').style.display != 'none') {
+        $("#groups_form").hide("slow", function () {} );
+    }
+    $("#file_form").show("slow", function () {});
+}
 
 
-$(document).ready(function() {
-    $("#btn_file").click(function() {
-        if (document.getElementById('groups_form').style.display != 'none')
-            $("#groups_form").hide("slow", function () {});
-        else if (document.getElementById('comment_form').style.display != 'none')
-            $('#comment_form').hide("slow", function() {});
-        $("#file_form").show("slow", function(){});
-    });
-});
+function hide_all () {
+    if (document.getElementById('groups_form').style.display != 'none') {
+        $("#groups_form").hide("slow", function () {
+        });
+    } else if (document.getElementById('file_form').style.display != 'none') {
+        $("#file_form").hide("slow", function () {} );
+    }
+
+}
+
 
 
 function go() {
     var host = document.location.host;
     var req = getXmlHttp();
     req.open('POST', 'http://' + host + '/req_comment', true);
-    var comment_text = document.getElementById('comment_form').textContent;
+    req.setRequestHeader("Content-type","application/json");
+    req.setRequestHeader("Accept-Languege", "en-US,en, ru;q=0.5");
+    var comment_text = $('#comment_form').val();
+    var groups = '';
+    if (document.getElementById('groups_form').style.display != 'none')
+        groups = $('#groups_form').val();
     req.onreadystatechange = function() {
         if (req.readyState == 4) {
             if(req.status == 200) {
@@ -80,5 +66,5 @@ function go() {
             }
         }
     };
-    req.send(comment_text);
+    req.send(JSON.stringify([comment_text, groups]));
 }

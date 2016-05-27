@@ -36,7 +36,7 @@ def send_css(path):
     return send_from_directory('css', path)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     with open('index.html', 'r') as f:
         return f.read()
@@ -44,7 +44,8 @@ def index():
 
 @app.route('/req_comment', methods=['GET', 'POST'])
 def req_comment():
-    prediction = classify(request.data)
+    req = request.get_json()
+    prediction = classify(req[0])
     return jsonify(result={"status": 200, "prediction": prediction})
 
 

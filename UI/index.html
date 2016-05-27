@@ -26,15 +26,17 @@
 
 
 <div class="container" style="-webkit-user-select:none; -moz-user-select:none;-ms-user-select:none">
+    <!-- Header -->
     <div class="header">
         <ul class="nav nav-pills pull-right">
             <li class="active"><a href="/">Settings</a></li>
             <li class="active"><a href="/ans">Results</a></li>
             <li><a href="#">About</a></li>
         </ul>
-        <h3 class="text-muted" >Classify your comment</h3>
+        <h3 class="text-muted" >Wants to know more about persone?</h3>
     </div>
 
+    <!-- Choosing classifier -->
     <div class="jumbotron">
         <h1>Choose classifiers</h1>
         <h2></h2>
@@ -49,24 +51,43 @@
         </div>
     </div>
 
+    <!-- Text and sampling -->
     <div class="jumbotron">
-        <h2>Choose sampling method</h2>
-        <div class="btn-group btn-group">
-            <button type="button" class="btn btn-success" id="btn_comment">By Comment</button>
-            <button type="button" class="btn btn-primary" id="btn_groups">By VK Groups</button>
-            <button type="button" class="btn btn-info" id="btn_file">By File</button>
-        </div>
-        <h1></h1>
-        <textarea id="comment_form" class="form-control" rows="3">Write comment</textarea>
+        <!-- Text -->
+        <h2>Text</h2>
+            <textarea id="comment_form" class="form-control" rows="3" placeholder="Write comment" required></textarea>
 
-        <textarea id="groups_form" class="form-control" rows="3" style="display:none">Write groups (-group_number)</textarea>
+        <h2>Choose sampling method</h2>
+        <!-- radios -->
+        <div>
+            <label>
+                <input type="radio" name="optionsRadios" id="radio_text" onclick="hide_all()" checked>
+                Standart
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="optionsRadios" id="radio_groups" onclick="show_groups_form()">
+                By Groups
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="optionsRadios" id="radio_file" onclick="show_file_form()">
+                By File
+            </label>
+        </div>
+
+        <!-- textarea and file area -->
+        <textarea id="groups_form" class="form-control" rows="3" style="display:none" placeholder="Write groups (-group_number)"></textarea>
 
         <div id="file_form" style="display:none">
-            <form name="upload">
+            <form name="upload" enctype="multipart/form-data" method="get">
                 <input type="file" name="myfile">
-                <input type="submit" value="Загрузить">
+                <input type="submit" value="Download">
             </form>
         </div>
+        <!-- ______________________________ -->
 
         <h1></h1>
         <button type="button" class="btn btn-danger btn-lg" id="btn_result" onclick="go()">Go!</button>
