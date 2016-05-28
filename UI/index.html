@@ -4,7 +4,7 @@
 <script src="js/bootstrap.min.js"></script>
 <script src="css/bootstrap.min.css"></script>
 <script src="css/jumbotron-narrow.css"></script>
-<script type="text/javascript" src="js/my_js.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -30,7 +30,7 @@
     <div class="header">
         <ul class="nav nav-pills pull-right">
             <li class="active"><a href="/">Settings</a></li>
-            <li class="active"><a href="/ans">Results</a></li>
+            <li class="active"><a href="/results">Results</a></li>
             <li><a href="#">About</a></li>
         </ul>
         <h3 class="text-muted" >Wants to know more about persone?</h3>
@@ -41,20 +41,20 @@
         <h1>Choose classifiers</h1>
         <h2></h2>
         <div class="checkbox">
-            <h3><input type="checkbox" value="" ><b>Sex</b></h3>
+            <h3><input type="checkbox" id="clf_sex"><b>Sex</b></h3>
         </div>
         <div class="checkbox">
-            <h3><input type="checkbox" value=""><b>Age</b></h3>
+            <h3><input type="checkbox" id="clf_age"><b>Age</b></h3>
         </div>
         <div class="checkbox disabled">
-            <h3><input type="checkbox" value=""><b>Education</b></h3>
+            <h3><input type="checkbox" id="clf_edu" checked><b>Education</b></h3>
         </div>
     </div>
 
     <!-- Text and sampling -->
     <div class="jumbotron">
         <!-- Text -->
-        <h2>Text</h2>
+        <h1>Text</h1>
             <textarea id="comment_form" class="form-control" rows="3" placeholder="Write comment" required></textarea>
 
         <h2>Choose sampling method</h2>
@@ -91,6 +91,16 @@
 
         <h1></h1>
         <button type="button" class="btn btn-danger btn-lg" id="btn_result" onclick="go()">Go!</button>
+        <form action="/results">
+            <button type="submit" class = "btn btn-success btn-lg"
+                id="btn_success" style="display: none" href="/results">Success! To Results</button>
+        </form>
+
+        <!-- Fill in all required forms -->
+
+        <p class="text-danger" style="display: none" id="check_clfs">Please, choose at least one classifier</p>
+        <p class="text-danger" style="display: none" id="check_text">Please, fill in text for classifying</p>
+        <p class="text-danger" style="display: none" id="check_groups">Please, fill in groups</p>
 
    </div>
 

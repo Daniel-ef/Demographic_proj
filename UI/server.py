@@ -1,17 +1,17 @@
 import json
 
 import numpy
-from flask import Flask, request, send_from_directory, jsonify
+from flask import Flask, request, send_from_directory
 
 from classifier import SimpleClassifier
 
-app = Flask(__name__, static_url_path='')
+app = Flask(__name__, static_url_path='', static_folder='')
+classifiers = {'clf_edu': SimpleClassifier()}
 
 
-def classify(comment):
+def classify(comment, clf):
     with open('../db/sample', 'r') as f:
         data = json.load(f)
-    clf = SimpleClassifier()
 
     x = []
     y = []
@@ -42,11 +42,43 @@ def index():
         return f.read()
 
 
+@app.route('/results')
+def results():
+    with open('results.html', 'r') as f:
+        return f.read()
+
+
+@app.route('/words_cloud')
+def w_cloud():
+    print('here')
+    with open('db/words_cloud.png') as f:
+        return f.read()
+
+
 @app.route('/req_comment', methods=['GET', 'POST'])
 def req_comment():
     req = request.get_json()
-    prediction = classify(req[0])
-    return jsonify(result={"status": 200, "prediction": prediction})
+        # MakingDB().init(public_list=req['groups'])
+    print(req)
+    results = {}
+    for clf in req['clfs']:
+        results[clf] = classify(req['comments'], classifiers[clf])
+    else:
+        res = ''
+        for estim in results.items():
+            res += '<tr>'
+            res += '<th>' + estim[0] + '</th>'
+            res += '<th>' + estim[1] + '</th>'
+            res += '</tr>'
+        with open('db/results', 'w') as f:
+            f.write(res)
+        return 'OK' # jsonify(results)
+
+
+@app.route('/results_file')
+def results_file():
+    with open('db/results', 'r') as f:
+        return f.read()
 
 
 if __name__ == '__main__':
