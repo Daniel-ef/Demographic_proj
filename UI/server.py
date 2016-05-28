@@ -1,16 +1,24 @@
 import json
+import os
 
 import numpy
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, redirect, url_for
+from werkzeug.utils import secure_filename
 
+import wcloud
 from classifier import SimpleClassifier
+from make_db import MakingDB
 
 app = Flask(__name__, static_url_path='', static_folder='')
+app.config['UPLOAD_FOLDER'] = 'db/upload'
+
+
 classifiers = {'clf_edu': SimpleClassifier()}
+clf_names = {'clf_edu': 'Education', 'clf_sex': 'Sex', 'clf_age': 'Age'}
 
 
-def classify(comment, clf):
-    with open('../db/sample', 'r') as f:
+def classify(comment, clf, sample_name):
+    with open('../db/' + sample_name, 'r') as f:
         data = json.load(f)
 
     x = []
@@ -26,20 +34,19 @@ def classify(comment, clf):
     return result
 
 
-@app.route('/js/<path:path>')
-def send_js(path):
-    return send_from_directory('js', path)
-
-
-@app.route('/css/<path:path>')
-def send_css(path):
-    return send_from_directory('css', path)
-
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    with open('index.html', 'r') as f:
-        return f.read()
+    if request.method == 'POST':
+        print(request.files['file'])
+        file = request.files['file']
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('uploaded_file',
+                                    filename=filename))
+    else:
+        with open('index.html', 'r') as f:
+            return f.read()
 
 
 @app.route('/results')
@@ -48,31 +55,31 @@ def results():
         return f.read()
 
 
-@app.route('/words_cloud')
-def w_cloud():
-    print('here')
-    with open('db/words_cloud.png') as f:
-        return f.read()
-
-
 @app.route('/req_comment', methods=['GET', 'POST'])
 def req_comment():
     req = request.get_json()
-        # MakingDB().init(public_list=req['groups'])
-    print(req)
+    sample_name = 'sample'
+    if req['groups'] != []:
+        public_l = req['groups']
+        print(public_l[:-1], int(public_l[len(public_l) - 1]))
+        MakingDB().init(public_list=public_l[:-1]
+                        , comments_amount=int(public_l[len(public_l) - 1])
+                        , sample_name='sample1')
+        sample_name = 'sample1'
     results = {}
     for clf in req['clfs']:
-        results[clf] = classify(req['comments'], classifiers[clf])
+        results[clf] = classify(req['comments'], classifiers[clf], sample_name)
     else:
         res = ''
+        wcloud.init(sample_name)
         for estim in results.items():
             res += '<tr>'
-            res += '<th>' + estim[0] + '</th>'
+            res += '<th>' + clf_names[estim[0]] + '</th>'
             res += '<th>' + estim[1] + '</th>'
             res += '</tr>'
         with open('db/results', 'w') as f:
             f.write(res)
-        return 'OK' # jsonify(results)
+        return 'OK'
 
 
 @app.route('/results_file')
