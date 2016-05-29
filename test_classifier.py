@@ -5,6 +5,7 @@ import time
 import numpy as np
 from sklearn import cross_validation
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
 
 from classifier import SimpleClassifier
 
@@ -39,7 +40,7 @@ def manual_cv(classifier, texts, labels, n_folds):
         test_result = classifier.predict(test_texts)
         score = accuracy_score(test_labels, test_result)
         scores.append(score)
-        # print(classification_report(test_labels, test_result))
+        print(classification_report(test_labels, test_result))
 
         cur_time = time.time() - cv_time
         times.append(cur_time)

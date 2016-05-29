@@ -3,7 +3,6 @@ import os
 import re
 import time
 
-import nltk
 import numpy
 import scipy
 from nltk.corpus import stopwords
@@ -39,7 +38,6 @@ class SimpleClassifier:
 
         self.np = numpy
         self.classifier = MultinomialNB()
-        self.tokenizer = nltk.tokenize.TweetTokenizer
         self.scaler = MaxAbsScaler()
         self.vectorizer = CountVectorizer(ngram_range=(1, 2)
                                      , stop_words=stop_words
@@ -79,7 +77,6 @@ class SimpleClassifier:
         logging.info(time.ctime(time.time())
                  + '\nClassifier: ' + str(self.classifier)
                  + '\nVectorizer: ' + str(self.vectorizer)
-                 + '\nTokenizer: ' + str(self.tokenizer)
                  + '\nScaler: ' + str(self.scaler)
                  + '\nshufle: on'
                  + '\n' + ' '.join(self.functions)
