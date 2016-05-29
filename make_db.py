@@ -47,7 +47,6 @@ class MakingDB:
         return com_id_list
 
     def create_new_man(self, people_db, id, text):
-        global errors_in_persons
         try:
             res = requests.get('http://api.vk.com/method/users.get', {
                 'user_ids': id,
@@ -108,7 +107,7 @@ class MakingDB:
             with open('db/people_db1', 'w') as f:
                 json.dump(db, f)
 
-    def handling_comment(self):
+    def comment_handling(self):
         with open(self.path + 'db/people_db1') as f:
             db = json.load(f)  # Все данные о человеке
 
@@ -179,7 +178,7 @@ class MakingDB:
         print('errors in persons', self.errors_in_persons)
         print('errors in comments', self.errors_in_comments)
         print('number of people', self.people)
-        self.handling_comment()
+        self.comment_handling()
 
 if __name__ == '__main__':
-    MakingDB().init(public_list=['-442'], comments_amount=1)
+    MakingDB().init(public_list=open('db/public_list', 'r').read().split('\n'), comments_amount=200)

@@ -19,6 +19,7 @@ def getting_path():
         path = re.sub('/[^\s/]+$', '', path)
     return path + '/'
 
+# Получние пути корневой папки проекта
 path_proj = getting_path()
 
 logging.basicConfig(filename=path_proj + 'db/log'
@@ -49,13 +50,13 @@ class SimpleClassifier:
         text = text.replace('_', ' ')
         text = text.replace('...', '.')
 
-        text = self.tag.sub('', text)
+        text = self.tag.sub('', text)  # Удаление тегов
         return text
 
     def fit(self, samples, labels):
-        add_feat_train, self.functions = add_feat(samples)
+        add_feat_train, self.functions = add_feat(samples)  # Признаки и массив функций для их получения
 
-        samples = [self.preprocessing(comment) for comment in samples]
+        samples = [self.preprocessing(comment) for comment in samples]  # Предобработка выборки
 
         samples = self.vectorizer.fit_transform(samples)
         samples = scipy.sparse.hstack([samples, add_feat_train])
@@ -65,7 +66,9 @@ class SimpleClassifier:
 
     def predict(self, samples):
         add_feat_train = add_feat(samples)[0]
+
         samples = [self.preprocessing(comment) for comment in samples]
+
         samples = self.vectorizer.transform(samples)
         samples = scipy.sparse.hstack([samples, add_feat_train])
         self.logger()
