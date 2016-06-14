@@ -108,10 +108,11 @@ class MakingDB:
                 json.dump(db, f)
 
     def comment_handling(self):
-        with open(self.path + 'db/people_db1') as f:
+        with open(self.path + 'db/people_db') as f:
             db = json.load(f)  # Все данные о человеке
 
-        sample = {0: [], 1: [], 2: [], 3: []}
+        # Education___________________________________________
+        sample_edu = {0: [], 1: [], 2: [], 3: []}
 
         def min_grade(hb):
             grade = 2100
@@ -141,44 +142,110 @@ class MakingDB:
                     elif min_grade(hb) < 2016:
                         group = 4
                 if group:
-                    sample[group - 1].append(hb['user_comments'])
+                    sample_edu[group - 1].append(hb['user_comments'])
 
-        sample_names = dict(
-            school=sample[0],
-            no_university=sample[1],
-            on_higher_edu=sample[2],
-            graduated=sample[3])
+        sample_names_edu = dict(
+            school=sample_edu[0],
+            no_university=sample_edu[1],
+            on_higher_edu=sample_edu[2],
+            graduated=sample_edu[3])
 
         # {'class_name': [comments]}
 
-        ################################################################
 
-        com_class = [{} for el in range(len(sample_names.keys()))]
+        com_class = [{} for el in range(len(sample_names_edu.keys()))]
         names_dic = {}
         k = 0
-        for key in sample_names:
+        for key in sample_names_edu:
             names_dic[k] = key
-            for meses in sample_names[key]:
+            for meses in sample_names_edu[key]:
                 for mes in meses:
                     com_class[k][mes] = k
             k += 1
         dic = {'comments-class': com_class,
                'class_names': names_dic}
 
-        with open(self.path + 'db/' + self.sample_name, 'w') as f:
+        with open(self.path + 'db/' + self.sample_name_edu, 'w') as f:
             json.dump(dic, f)
+
+        # Sex____________________________________________________________
+
+        com_class = [{} for el in range(2)]
+        names_dic = {0: 'female', 1: 'male'}
+        for hb in db:
+            sex = int(hb['sex'])
+
+            if hb['user_comments'] and sex != 0:
+                for mes in hb['user_comments']:
+                    com_class[sex - 1][mes] = sex - 1
+
+        dic = {'comments-class': com_class,
+               'class_names': names_dic}
+
+        with open(self.path + 'db/' + self.sample_name_sex, 'w') as f:
+            json.dump(dic, f)
+
+        # Age______________________________________________________
+
+        sample_age = {0: [], 1: [], 2: [], 3: []}
+
+        k = 0
+
+        for hb in db:
+            date = int(hb['bdate'][-4:])
+            k += 1
+
+            if hb['user_comments']:
+                if date > 1997:
+                    group = 1
+                elif 1990 < date <= 1997:
+                    group = 2
+                elif 1975 < date <= 1990:
+                    group = 3
+                else:
+                    group = 4
+
+                sample_age[group - 1].append(hb['user_comments'])
+
+        sample_names_age = {
+            '<18': sample_age[0],
+            '18-25': sample_age[1],
+            '25-40': sample_age[2],
+            '>40': sample_age[3]}
+
+        # {'class_name': [comments]}
+
+
+        com_class = [{} for el in range(len(sample_names_age.keys()))]
+        names_dic = {}
+        k = 0
+        for key in sample_names_age:
+            names_dic[k] = key
+            for meses in sample_names_age[key]:
+                for mes in meses:
+                    com_class[k][mes] = k
+            k += 1
+        dic = {'comments-class': com_class,
+               'class_names': names_dic}
+
+        with open(self.path + 'db/' + self.sample_name_age, 'w') as f:
+            json.dump(dic, f)
+    # ________________________________________________________________
 
     def init(self
              , public_list=open(getting_path() + 'db/public_list', 'r').read().split('\n')
              , comments_amount=200
-             , sample_name='sample1'
+             , sample_name='sample'
              ):
-        self.public_handling(public_list, comments_amount)
-        self.sample_name = sample_name
+        # self.public_handling(public_list, comments_amount)
+
+        self.sample_name_edu = sample_name + '_edu'
+        self.sample_name_sex = sample_name + '_sex'
+        self.sample_name_age = sample_name + '_age'
         print('errors in persons', self.errors_in_persons)
         print('errors in comments', self.errors_in_comments)
         print('number of people', self.people)
         self.comment_handling()
 
 if __name__ == '__main__':
-    MakingDB().init(public_list=open('db/public_list', 'r').read().split('\n'), comments_amount=200)
+    MakingDB().init(sample_name='sample')

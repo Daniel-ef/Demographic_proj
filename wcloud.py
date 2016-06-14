@@ -23,8 +23,8 @@ def preprocessing(text):
     return text
 
 
-def init(sample_name):
-    with open(getting_path() + 'db/' + sample_name, 'r') as f:
+def init():
+    with open(getting_path() + 'db/sample', 'r') as f:
         file = json.load(f)
 
     with open(getting_path() + 'db/stop_words', 'r') as f:
@@ -44,7 +44,7 @@ def init(sample_name):
 
     wordcloud.to_file(getting_path() + 'UI/db/wcloud.png')
 
-init('sample1')
+init('sample')
 
 """
 plt.imshow(wordcloud)
